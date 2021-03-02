@@ -8,18 +8,15 @@ import java.util.Optional;
 
 public interface UserDao {
 
-    int insertUser(ObjectId id, User user);
+    User insert(User user);
 
-    default int insertUser(User user) {
-        ObjectId id = ObjectId.get();
-        return insertUser(id, user);
-    }
+    List<User> findAll(int page, int limit);
 
-    List<User> selectAllUsers();
+    Optional<User> findById(ObjectId id);
 
-    Optional<User> selectUserById(ObjectId id);
+    int deleteById(ObjectId id);
 
-    int deleteUserById(ObjectId id);
+    int setAsAdminById(ObjectId id);
 
-    int updateUserById(ObjectId id, User user);
+    Optional<User> findByEmail(String email);
 }

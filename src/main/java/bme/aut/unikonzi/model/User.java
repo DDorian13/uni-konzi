@@ -4,27 +4,34 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
 
 @Document(collection = "users")
 public class User {
 
     @Id
+    @Null
     private final ObjectId id;
 
     @NotBlank
+    @Field("name")
     private final String name;
 
     @NotBlank
     @Email
+    @Field("email")
     private String email;
 
     @NotBlank
+    @Field("password")
     private String password;
 
+    @Field("role")
     private Role role;
 
     public User(@JsonProperty("id") ObjectId id,
@@ -39,6 +46,8 @@ public class User {
     }
 
     public String getId() {
+        if (id == null)
+            return null;
         return id.toString();
     }
 
