@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
-import javax.validation.constraints.Pattern;
 
 @Document(collection = "users")
 public class User {
@@ -25,11 +24,11 @@ public class User {
     @NotBlank
     @Email
     @Field("email")
-    private String email;
+    private final String email;
 
     @NotBlank
     @Field("password")
-    private String password;
+    private final String password;
 
     @Field("role")
     private Role role;
