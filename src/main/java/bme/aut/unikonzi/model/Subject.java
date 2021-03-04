@@ -1,5 +1,6 @@
 package bme.aut.unikonzi.model;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonFilter("filterByName")
 @Document("subjects")
 public class Subject {
 
@@ -59,5 +61,9 @@ public class Subject {
 
     public List<Comment> getComments() {
         return comments;
+    }
+
+    public void addComment(Comment newComment) {
+        comments.add(newComment);
     }
 }

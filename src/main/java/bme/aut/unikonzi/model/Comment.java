@@ -3,6 +3,7 @@ package bme.aut.unikonzi.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotBlank;
@@ -13,7 +14,7 @@ public class Comment {
     private final ObjectId id;
 
     @Field("user")
-    @NotBlank
+    @DBRef
     private final User user;
 
     @Field("text")
@@ -23,13 +24,17 @@ public class Comment {
     public Comment(@JsonProperty("id") ObjectId id,
                    @JsonProperty("user") User user,
                    @JsonProperty("text") String text) {
-        this.id = id;
+        if (id != null) {
+            this.id = id;
+        } else {
+            this.id = ObjectId.get();
+        }
         this.user = user;
         this.text = text;
     }
 
-    public ObjectId getId() {
-        return id;
+    public String getId() {
+        return id.toString();
     }
 
     public User getUser() {

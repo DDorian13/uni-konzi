@@ -2,19 +2,23 @@ package bme.aut.unikonzi.api;
 
 import bme.aut.unikonzi.model.University;
 import bme.aut.unikonzi.service.UniversityService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.function.EntityResponse;
 
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
-@RequestMapping(value = "api/universities", produces = "application/json")
+@RequestMapping(value = "api/universities/", produces = "application/json")
 @RestController
 public class UniversityController {
 
@@ -26,9 +30,10 @@ public class UniversityController {
     }
 
     @GetMapping
-    public List<University> getAllUniversities(@RequestParam(defaultValue = "1", required = false) int page,
+    public ResponseEntity<?> getAllUniversities(@RequestParam(defaultValue = "1", required = false) int page,
                                                @RequestParam(defaultValue = "10", required = false) int limit) {
-        return universityService.getAllUniversities(page, limit);
+        String result = universitiesToJson(false, universityService.getAllUniversities(page, limit));
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping
@@ -38,7 +43,7 @@ public class UniversityController {
             String error = "{\"error\": \"University already exists\"}";
             return new ResponseEntity<>(error, HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(newUniversity.get(), HttpStatus.CREATED);
+        return new ResponseEntity<>(universitiesToJson(false, newUniversity.get()), HttpStatus.CREATED);
     }
 
     @GetMapping(path = "{id}")
@@ -48,7 +53,7 @@ public class UniversityController {
             String error = "{\"error\": \"University with the given id does not exists\"}";
             return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(university.get());
+        return ResponseEntity.ok(universitiesToJson(true, university.get()));
     }
 
     @DeleteMapping(path = "{id}")
@@ -69,13 +74,35 @@ public class UniversityController {
             String error = "{\"error\": \"University with the given id does not exists\"}";
             return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(updatedUniversity.get());
+        return ResponseEntity.ok(universitiesToJson(true, updatedUniversity.get()));
     }
 
     @GetMapping(path = "search")
-    public List<University> getUniversitiesByNameLike(@RequestParam("nameLike") String nameLike,
+    public ResponseEntity<?> getUniversitiesByNameLike(@RequestParam("nameLike") String nameLike,
                                                       @RequestParam(defaultValue = "1", required = false) int page,
                                                       @RequestParam(defaultValue = "10", required = false) int limit) {
-        return universityService.getUniversitiesByNameRegex(nameLike, page, limit);
+        return ResponseEntity.ok(
+                universitiesToJson(false,
+                        universityService.getUniversitiesByNameRegex(nameLike, page, limit)));
+    }
+
+    private String universitiesToJson(boolean withSubjects, Object value) {
+        ObjectMapper mapper = new ObjectMapper();
+        FilterProvider filter;
+        if (withSubjects) {
+            filter = new SimpleFilterProvider()
+                    .addFilter("filterByName", SimpleBeanPropertyFilter.serializeAllExcept("comments"));
+        } else {
+            filter = new SimpleFilterProvider()
+                    .addFilter("filterByName", SimpleBeanPropertyFilter.serializeAllExcept("subjects"));
+        }
+        ObjectWriter writer = mapper.writer(filter);
+        String result = new String();
+        try {
+            result = writer.writeValueAsString(value);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }

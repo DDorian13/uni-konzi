@@ -1,5 +1,6 @@
 package bme.aut.unikonzi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -36,12 +37,13 @@ public class User {
     public User(@JsonProperty("id") ObjectId id,
                 @JsonProperty("name") String name,
                 @JsonProperty("email") String email,
-                @JsonProperty("password") String password) {
+                @JsonProperty("password") String password,
+                @JsonProperty("role") Role role) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        role = Role.User;
+        this.role = role;
     }
 
     public String getId() {
@@ -58,6 +60,7 @@ public class User {
         return email;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }

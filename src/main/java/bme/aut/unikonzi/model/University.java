@@ -1,17 +1,17 @@
 package bme.aut.unikonzi.model;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonFilter("filterByName")
 @Document(collection = "universities")
 public class University {
 
@@ -71,5 +71,9 @@ public class University {
 
     public void setId(ObjectId id) {
         this.id = id;
+    }
+
+    public void addSubject(Subject newSubject) {
+        subjects.add(newSubject);
     }
 }

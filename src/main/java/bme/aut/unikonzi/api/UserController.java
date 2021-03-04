@@ -1,5 +1,6 @@
 package bme.aut.unikonzi.api;
 
+import bme.aut.unikonzi.model.LoginUser;
 import bme.aut.unikonzi.model.User;
 import bme.aut.unikonzi.service.UserService;
 import org.bson.types.ObjectId;
@@ -24,8 +25,9 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
+    @PostMapping("/signup")
     public ResponseEntity<?> addUser(@Valid @NonNull @RequestBody User user) {
+        user.setRole(User.Role.User);
         Optional<User> newUser = userService.addUser(user);
         if (newUser.isEmpty()) {
             String text = "{\"error\": \"Already registered with this email\"}";
@@ -65,5 +67,16 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(path = "login")
+    public ResponseEntity<?> loginUser(@Valid @NonNull @RequestBody LoginUser loginUser) {
+        Optional<User> user = userService.loginUser(loginUser.getEmail(), loginUser.getPassword());
+        if (user.isEmpty()) {
+            String error = "{\"error\": \"Wrong credentials\"}";
+            return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
+        }
+        String token = "{\"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJlZGJ1bGwzM0BmMS5jb20iLCJwYXNzd29yZCI6IlRpdGxlV2luMjAyMSJ9.okHcgzwh7jt1w6zFs_UZpq-OyftWWANVTcpDbGMdAmM\"}";
+        return ResponseEntity.ok(token);
     }
 }
