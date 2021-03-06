@@ -12,12 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping(value = "api/universities/", produces = "application/json")
 @RestController
 public class UniversityController {
@@ -37,6 +38,7 @@ public class UniversityController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addUniversity(@Valid @NonNull @RequestBody University university) {
         Optional<University> newUniversity = universityService.addUniversity(university);
         if (newUniversity.isEmpty()) {
@@ -57,6 +59,7 @@ public class UniversityController {
     }
 
     @DeleteMapping(path = "{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUniversityById(@PathVariable("id") ObjectId id) {
         if (universityService.deleteUniversity(id) == 0) {
             String error = "{\"error\": \"University with the given id does not exists\"}";
@@ -67,6 +70,7 @@ public class UniversityController {
     }
 
     @PatchMapping(path = "{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateUniversityById(@PathVariable("id") ObjectId id,
                                                   @Valid @NonNull @RequestBody University university) {
         Optional<University> updatedUniversity = universityService.updateUniversityById(id, university);

@@ -1,6 +1,6 @@
 package bme.aut.unikonzi.service;
 
-import bme.aut.unikonzi.dao.impl.MongoUniversityDao;
+import bme.aut.unikonzi.dao.UniversityDao;
 import bme.aut.unikonzi.model.Comment;
 import bme.aut.unikonzi.model.Subject;
 import bme.aut.unikonzi.model.University;
@@ -14,10 +14,10 @@ import java.util.Optional;
 @Service
 public class SubjectService {
 
-    private final MongoUniversityDao universityRepository;
+    private final UniversityDao universityRepository;
 
     @Autowired
-    public SubjectService(MongoUniversityDao universityRepository) {
+    public SubjectService(UniversityDao universityRepository) {
         this.universityRepository = universityRepository;
     }
 

@@ -34,7 +34,7 @@ public class MongoUserDao extends MongoCommonDao<User> implements UserDao {
         User user = mongoTemplate.findById(id, User.class, collectionName);
         if (user == null)
             return 0;
-        user.setRole(User.Role.Admin);
+        user.addRole(User.Role.ROLE_ADMIN);
         mongoTemplate.save(user);
         return 1;
     }
@@ -43,6 +43,14 @@ public class MongoUserDao extends MongoCommonDao<User> implements UserDao {
     public Optional<User> findByEmail(String email) {
         Query query = new Query();
         query.addCriteria(Criteria.where("email").is(email));
+        User user = mongoTemplate.findOne(query, User.class, collectionName);
+        return (user != null) ? Optional.of(user) : Optional.empty();
+    }
+
+    @Override
+    public Optional<User> findByName(String name) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("name").is(name));
         User user = mongoTemplate.findOne(query, User.class, collectionName);
         return (user != null) ? Optional.of(user) : Optional.empty();
     }

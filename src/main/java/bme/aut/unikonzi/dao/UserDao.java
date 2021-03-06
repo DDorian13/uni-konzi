@@ -11,4 +11,6 @@ public interface UserDao extends CommonDao<User> {
     int setAsAdminById(ObjectId id);
 
     Optional<User> findByEmail(String email);
+
+    Optional<User> findByName(String name);
 }

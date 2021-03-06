@@ -13,11 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Optional;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping(value = "api/universities/{universityId}", produces = "application/json")
 @RestController
 public class SubjectController {
@@ -30,6 +32,7 @@ public class SubjectController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addSubject(@PathVariable("universityId") ObjectId universityId,
                                         @Valid @NonNull @RequestBody Subject subject) {
         Optional<Subject> newSubject = subjectService.addSubject(universityId, subject);
@@ -44,6 +47,7 @@ public class SubjectController {
     }
 
     @PatchMapping(path = "{subjectId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateSubjectById(@PathVariable("universityId") ObjectId universityId,
                                                @PathVariable("subjectId") ObjectId subjectId,
                                                @Valid @NonNull @RequestBody Subject subject) {
@@ -56,6 +60,7 @@ public class SubjectController {
     }
 
     @DeleteMapping(path = "{subjectId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteSubjectById(@PathVariable("universityId") ObjectId universityId,
                                                @PathVariable("subjectId") ObjectId subjectId) {
         Optional<Subject> deletedSubject = subjectService.updateOrRemoveSubjectById(universityId, subjectId, null);

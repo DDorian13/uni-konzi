@@ -47,6 +47,10 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    public Optional<User> getUserByName(String name) {
+        return userRepository.findByName(name);
+    }
+
     public Optional<User> loginUser(String email, String password) {
         Optional<User> user = getUserByEmail(email);
         if (user.isEmpty() || !user.get().getPassword().equals(password)) {

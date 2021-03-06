@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
+import java.util.HashSet;
+import java.util.Set;
 
 @Document(collection = "users")
 public class User {
@@ -29,16 +31,16 @@ public class User {
 
     @NotBlank
     @Field("password")
-    private final String password;
+    private String password;
 
     @Field("role")
-    private Role role;
+    private Set<Role> role = new HashSet<>();
 
     public User(@JsonProperty("id") ObjectId id,
                 @JsonProperty("name") String name,
                 @JsonProperty("email") String email,
                 @JsonProperty("password") String password,
-                @JsonProperty("role") Role role) {
+                @JsonProperty("role") Set<Role> role) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -65,16 +67,24 @@ public class User {
         return password;
     }
 
-    public Role getRole() {
+    public Set<Role> getRoles() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void addRole(Role role) {
+        this.role.add(role);
+    }
+
+    public void setRole(Set<Role> role) {
         this.role = role;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public enum Role {
-        Admin,
-        User
+        ROLE_ADMIN,
+        ROLE_USER
     }
 }
