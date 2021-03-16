@@ -2,6 +2,9 @@ package bme.aut.unikonzi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 public class UniKonziApplication {
@@ -10,4 +13,17 @@ public class UniKonziApplication {
         SpringApplication.run(UniKonziApplication.class, args);
     }
 
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/**")
+                        .allowedOrigins("*")
+                        .allowedMethods("OPTIONS", "PUT", "POST", "PATCH", "DELETE", "GET")
+                        .allowedHeaders("Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization")
+                        .allowCredentials(false);
+            }
+        };
+    }
 }
