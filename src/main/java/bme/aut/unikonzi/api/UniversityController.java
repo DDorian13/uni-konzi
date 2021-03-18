@@ -19,7 +19,7 @@ import javax.validation.Valid;
 import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping(value = "api/universities/", produces = "application/json")
+@RequestMapping(value = "api/universities", produces = "application/json")
 @RestController
 public class UniversityController {
 
