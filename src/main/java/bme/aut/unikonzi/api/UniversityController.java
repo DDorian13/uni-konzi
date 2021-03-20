@@ -49,8 +49,10 @@ public class UniversityController {
     }
 
     @GetMapping(path = "{id}")
-    public ResponseEntity<?> getUniversityById(@PathVariable("id") ObjectId id) {
-        Optional<University> university = universityService.getUniversityById(id);
+    public ResponseEntity<?> getUniversityById(@PathVariable("id") ObjectId id,
+                                               @RequestParam(defaultValue = "1", required = false) int page,
+                                               @RequestParam(defaultValue = "10", required = false) int limit) {
+        Optional<University> university = universityService.getUniversityById(id, page, limit);
         if (university.isEmpty()) {
             String error = "{\"error\": \"University with the given id does not exists\"}";
             return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
@@ -83,8 +85,8 @@ public class UniversityController {
 
     @GetMapping(path = "search")
     public ResponseEntity<?> getUniversitiesByNameLike(@RequestParam("nameLike") String nameLike,
-                                                      @RequestParam(defaultValue = "1", required = false) int page,
-                                                      @RequestParam(defaultValue = "10", required = false) int limit) {
+                                                      @RequestParam(name = "page", defaultValue = "1", required = false) int page,
+                                                      @RequestParam(name = "limit", defaultValue = "10", required = false) int limit) {
         return ResponseEntity.ok(
                 universitiesToJson(false,
                         universityService.getUniversitiesByNameRegex(nameLike, page, limit)));

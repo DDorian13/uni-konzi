@@ -1,11 +1,13 @@
 package bme.aut.unikonzi.service;
 
 import bme.aut.unikonzi.dao.UniversityDao;
+import bme.aut.unikonzi.model.Subject;
 import bme.aut.unikonzi.model.University;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,8 +33,12 @@ public class UniversityService {
         return universityRepository.findAll(page, limit);
     }
 
-    public Optional<University> getUniversityById(ObjectId id) {
-        return universityRepository.findById(id);
+    public Optional<University> getUniversityById(ObjectId id, int page, int limit) {
+        Optional<University> uniMaybe = universityRepository.findById(id);
+        if (uniMaybe.isEmpty()) {
+            return uniMaybe;
+        }
+        return Optional.of(subjectsToPageable(uniMaybe.get(), page, limit));
     }
 
     public int deleteUniversity(ObjectId id) {
@@ -49,5 +55,26 @@ public class UniversityService {
 
     public List<University> getUniversitiesByNameRegex(String name, int page, int limit) {
         return universityRepository.findByNameRegex(name, page, limit);
+    }
+
+    private University subjectsToPageable(University original, int page, int limit) {
+        int fromIndex = (page - 1) * limit;
+        int toIndex = fromIndex + limit;
+        List<Subject> subjects = original.getSubjects();
+        if (fromIndex >= subjects.size() || fromIndex < 0) {
+            subjects = Collections.emptyList();
+        } else if (toIndex > subjects.size()) {
+            toIndex = subjects.size();
+        }
+        if (!subjects.isEmpty()) {
+            subjects = subjects.subList(fromIndex, toIndex);
+        }
+        return new University(
+                new ObjectId(original.getId()),
+                original.getName(),
+                original.getCountry(),
+                original.getCity(),
+                subjects
+        );
     }
 }

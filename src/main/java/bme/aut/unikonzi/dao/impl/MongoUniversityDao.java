@@ -53,10 +53,10 @@ public class MongoUniversityDao extends MongoCommonDao<University> implements Un
     @Override
     public List<University> findByNameRegex(String name, int page, int limit) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("name").regex(name));
+        query.addCriteria(Criteria.where("name").regex(name, "i"));
         List<University> universities = mongoTemplate.find(query, University.class, collectionName);
         int fromIndex = (page - 1) * limit;
-        int toIndex = page + limit;
+        int toIndex = fromIndex + limit;
         if (fromIndex >= universities.size() || fromIndex < 0)
             return Collections.emptyList();
         if (toIndex > universities.size())
