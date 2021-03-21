@@ -86,7 +86,7 @@ public class UserController {
         return ResponseEntity.ok("{\"message\": \"The user was deleted successfully\"}");
     }
 
-    @RequestMapping(method = RequestMethod.HEAD, path = "{id}")
+    @PatchMapping(path = "{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> setUserAsAdminById(@PathVariable("id") ObjectId id) {
         if (userService.setUserAsAdmin(id) == 0) {
