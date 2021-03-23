@@ -2,7 +2,11 @@ package bme.aut.unikonzi.api;
 
 import bme.aut.unikonzi.model.Comment;
 import bme.aut.unikonzi.model.Subject;
+import bme.aut.unikonzi.model.User;
+import bme.aut.unikonzi.model.payload.request.CommentBody;
+import bme.aut.unikonzi.security.jwt.JwtUtils;
 import bme.aut.unikonzi.service.SubjectService;
+import bme.aut.unikonzi.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
@@ -25,10 +29,15 @@ import java.util.Optional;
 public class SubjectController {
 
     private final SubjectService subjectService;
+    private final UserService userService;
 
     @Autowired
-    public SubjectController(SubjectService subjectService) {
+    JwtUtils jwtUtils;
+
+    @Autowired
+    public SubjectController(SubjectService subjectService, UserService userService) {
         this.subjectService = subjectService;
+        this.userService = userService;
     }
 
     @PostMapping
@@ -86,8 +95,16 @@ public class SubjectController {
     @PostMapping(path = "{subjectId}")
     public ResponseEntity<?> addCommentToSubject(@PathVariable("universityId") ObjectId universityId,
                                                  @PathVariable("subjectId") ObjectId subjectId,
-                                                 @Valid @NonNull @RequestBody Comment comment) {
-        Optional<Comment> newComment = subjectService.addCommentToSubject(universityId, subjectId, comment);
+                                                 @Valid @NonNull @RequestBody CommentBody comment,
+                                                 @RequestHeader("Authorization") String token) {
+        User user = userService.getUserByName(jwtUtils.getUserNameFromJwtToken(
+                token.substring(7, token.length())
+        )).get();
+        Optional<Comment> newComment = subjectService.addCommentToSubject(
+                universityId,
+                subjectId,
+                new Comment(null, user, comment.getText())
+        );
         if (newComment.isEmpty()) {
             String error = "{\"error\": \"The id of the university or the subject is invalid\"}";
             return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
