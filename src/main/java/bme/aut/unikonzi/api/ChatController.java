@@ -4,7 +4,6 @@ import bme.aut.unikonzi.model.ChatMessage;
 import bme.aut.unikonzi.model.ChatNotification;
 import bme.aut.unikonzi.service.ChatMessageService;
 import bme.aut.unikonzi.service.ChatRoomService;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
+@RequestMapping(value = "api", produces = "application/json")
 @Controller
 public class ChatController {
 
@@ -48,19 +48,24 @@ public class ChatController {
     }
 
     @GetMapping("/messages/{senderId}/{recipientId}/count")
-    public ResponseEntity<Long> countNewMessages(@PathVariable ObjectId senderId,
-                                                 @PathVariable ObjectId recipientId) {
+    public ResponseEntity<Long> countNewMessages(@PathVariable("senderId") String senderId,
+                                                 @PathVariable("recipientId") String recipientId) {
         return ResponseEntity.ok(chatMessageService.countNewMessages(senderId, recipientId));
     }
 
     @GetMapping("/messages/{senderId}/{recipientId}")
-    public ResponseEntity<?> findChatMessages (@PathVariable ObjectId senderId,
-                                               @PathVariable ObjectId recipientId) {
+    public ResponseEntity<?> findChatMessages (@PathVariable("senderId") String senderId,
+                                               @PathVariable("recipientId") String recipientId) {
         return ResponseEntity.ok(chatMessageService.findChatMessages(senderId, recipientId));
     }
 
     @GetMapping("/messages/{id}")
-    public ResponseEntity<?> findMessage (@PathVariable ObjectId id){
+    public ResponseEntity<?> findMessage (@PathVariable("id") String id){
         return ResponseEntity.ok(chatMessageService.findById(id));
+    }
+
+    @GetMapping("/messages/{senderId}/contacts")
+    public ResponseEntity<?> findContacts(@PathVariable("senderId") String senderId) {
+        return ResponseEntity.ok(chatRoomService.getContacts(senderId));
     }
 }

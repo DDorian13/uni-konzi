@@ -4,11 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 @Data
@@ -19,11 +16,11 @@ import java.util.Date;
 public class ChatMessage {
 
     @Id
-    private ObjectId id;
+    private String id;
 
     private String chatId;
-    private ObjectId senderId;
-    private ObjectId recipientId;
+    private String senderId;
+    private String recipientId;
     private String senderName;
     private String recipientName;
     private String message;

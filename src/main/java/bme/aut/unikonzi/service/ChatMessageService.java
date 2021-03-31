@@ -4,7 +4,6 @@ import bme.aut.unikonzi.dao.ChatMessageRepository;
 import bme.aut.unikonzi.exception.MessageNotFoundException;
 import bme.aut.unikonzi.model.ChatMessage;
 import bme.aut.unikonzi.model.MessageStatus;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -33,11 +32,11 @@ public class ChatMessageService {
         return chatMessageRepository.save(chatMessage);
     }
 
-    public long countNewMessages(ObjectId senderId, ObjectId recipientId) {
+    public long countNewMessages(String senderId, String recipientId) {
         return chatMessageRepository.countBySenderIdAndRecipientIdAndMessageStatus(senderId, recipientId, MessageStatus.RECEIVED);
     }
 
-    public List<ChatMessage> findChatMessages(ObjectId senderId, ObjectId recipientId) {
+    public List<ChatMessage> findChatMessages(String senderId, String recipientId) {
         Optional<String> chatId = chatRoomService.getChatId(senderId, recipientId, false);
         List<ChatMessage> messages = chatId.map(_chatId -> chatMessageRepository.findByChatId(_chatId)).orElse(new ArrayList<>());
 
@@ -48,14 +47,14 @@ public class ChatMessageService {
         return messages;
     }
 
-    public void updateStatuses(ObjectId senderId, ObjectId recipientId, MessageStatus status) {
+    public void updateStatuses(String senderId, String recipientId, MessageStatus status) {
         Query query = new Query(Criteria.where("senderId").is(senderId)
                                 .and("recipientId").is(recipientId));
         Update update = Update.update("messageStatus", status);
         mongoOperations.updateMulti(query, update, ChatMessage.class);
     }
 
-    public ChatMessage findById(ObjectId id) {
+    public ChatMessage findById(String id) {
         return chatMessageRepository
                 .findById(id)
                 .map(chatMessage -> {
