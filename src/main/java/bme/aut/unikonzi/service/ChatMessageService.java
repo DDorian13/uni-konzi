@@ -32,6 +32,10 @@ public class ChatMessageService {
         return chatMessageRepository.save(chatMessage);
     }
 
+    public int hasNewMessageFromAnybody(String recipientId) {
+        return chatMessageRepository.findFirstByRecipientIdAndMessageStatus(recipientId, MessageStatus.RECEIVED).isPresent() ? 1 : 0;
+    }
+
     public long countNewMessages(String senderId, String recipientId) {
         return chatMessageRepository.countBySenderIdAndRecipientIdAndMessageStatus(senderId, recipientId, MessageStatus.RECEIVED);
     }

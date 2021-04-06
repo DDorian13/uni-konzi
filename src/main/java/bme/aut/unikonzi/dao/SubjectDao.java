@@ -1,6 +1,7 @@
 package bme.aut.unikonzi.dao;
 
 import bme.aut.unikonzi.model.Subject;
+import bme.aut.unikonzi.model.User;
 import org.bson.types.ObjectId;
 
 import java.util.List;
@@ -13,4 +14,6 @@ public interface SubjectDao extends CommonDao<Subject> {
     List<Subject> findByNameRegex(String name, int page, int limit);
 
     List<Subject> findByCodeRegex(String code, int page, int limit);
+
+    List<Subject> containsTutorOrPupil(String property, User user, int page, int limit);
 }

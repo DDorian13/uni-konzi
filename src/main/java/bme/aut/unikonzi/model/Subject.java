@@ -4,19 +4,22 @@ import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @JsonFilter("filterByName")
 @Document("subjects")
 public class Subject {
 
     @Id
-    private final ObjectId id;
+    private ObjectId id;
 
     @Field("code")
     @NotBlank
@@ -28,6 +31,14 @@ public class Subject {
 
     @Field("comments")
     private List<Comment> comments;
+
+    @Field("tutors")
+    @DBRef
+    private Set<User> tutors = new HashSet<>();
+
+    @Field("pupils")
+    @DBRef
+    private Set<User> pupils = new HashSet<>();
 
     public Subject(@JsonProperty("id") ObjectId id,
                    @JsonProperty("code") String code,
@@ -51,6 +62,10 @@ public class Subject {
         return id.toString();
     }
 
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
+
     public String getCode() {
         return code;
     }
@@ -65,5 +80,25 @@ public class Subject {
 
     public void addComment(Comment newComment) {
         comments.add(newComment);
+    }
+
+    public Set<User> getTutors() {
+        return tutors;
+    }
+
+    public Set<User> getPupils() {
+        return pupils;
+    }
+
+    public void addTutor(User user) {
+        tutors.add(user);
+    }
+
+    public void addPupil(User user) {
+        pupils.add(user);
+    }
+
+    public boolean removePupil(User user) {
+        return pupils.remove(user);
     }
 }

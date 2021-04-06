@@ -3,6 +3,7 @@ package bme.aut.unikonzi.dao.impl;
 import bme.aut.unikonzi.dao.CommonDao;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,15 +33,11 @@ public class MongoCommonDao<T> implements CommonDao<T> {
 
     public List<T> findAll(int page, int limit) {
         int fromIndex = (page - 1) * limit;
-        int toIndex = fromIndex + limit;
-        List<T> all = mongoTemplate.findAll(typeParameterClass, collection);
-        if (fromIndex >= all.size() || fromIndex < 0) {
-            return Collections.emptyList();
-        }
-        if (toIndex > all.size()) {
-            toIndex = all.size();
-        }
-        return all.subList(fromIndex, toIndex);
+        Query query = new Query();
+        query.skip(fromIndex);
+        query.limit(limit);
+
+        return mongoTemplate.find(query, typeParameterClass, collection);
     }
 
     public Optional<T> findById(ObjectId id) {

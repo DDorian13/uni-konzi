@@ -53,6 +53,17 @@ public class UniversityService {
         return universityRepository.updateById(id, university);
     }
 
+    public int removeSubjectFromUniversity(ObjectId universityId, Subject subject) {
+        Optional<University> uniMaybe = universityRepository.findById(universityId);
+        if (uniMaybe.isEmpty()) {
+            return 0;
+        }
+
+        University university = uniMaybe.get();
+        university.removeSubject(subject);
+        return 1;
+    }
+
     public List<University> getUniversitiesByNameRegex(String name, int page, int limit) {
         return universityRepository.findByNameRegex(name, page, limit);
     }

@@ -1,9 +1,11 @@
 package bme.aut.unikonzi.service;
 
+import bme.aut.unikonzi.dao.SubjectDao;
 import bme.aut.unikonzi.dao.UniversityDao;
 import bme.aut.unikonzi.model.Comment;
 import bme.aut.unikonzi.model.Subject;
 import bme.aut.unikonzi.model.University;
+import bme.aut.unikonzi.model.User;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,90 +16,80 @@ import java.util.Optional;
 @Service
 public class SubjectService {
 
-    private final UniversityDao universityRepository;
+    private final SubjectDao subjectRepository;
 
     @Autowired
-    public SubjectService(UniversityDao universityRepository) {
-        this.universityRepository = universityRepository;
+    public SubjectService(SubjectDao subjectRepository) {
+        this.subjectRepository = subjectRepository;
     }
 
-    public Optional<Subject> getSubjectByCode(ObjectId universityId, String code) {
-        Optional<University> university = universityRepository.findById(universityId);
-        if (university.isEmpty()) {
-            return Optional.empty();
-        }
-        List<Subject> subjects = university.get().getSubjects();
-        return subjects.stream().filter(subject -> subject.getCode().equalsIgnoreCase(code)).findFirst();
+    public Optional<Subject> addSubject(Subject subject) {
+        return Optional.of(subjectRepository.insert(subject));
     }
 
-    public Optional<Subject> addSubject(ObjectId universityId, Subject subject) {
-        Optional<University> universityMaybe = universityRepository.findById(universityId);
-        Optional<Subject> subjectMaybe = getSubjectByCode(universityId, subject.getCode());
-        if (universityMaybe.isEmpty()) {
-            return null;
-        } else if (subjectMaybe.isPresent()) {
-            return Optional.empty();
-        }
-        University university = universityMaybe.get();
-        university.addSubject(subject);
-        universityRepository.updateById(universityId, university);
-        return Optional.of(subject);
+    public Optional<Subject> getSubjectById(ObjectId subjectId) {
+        return subjectRepository.findById(subjectId);
     }
 
-    public Optional<Subject> getSubjectById(ObjectId universityId, ObjectId subjectId) {
-        Optional<University> university = universityRepository.findById(universityId);
-        if (university.isEmpty()) {
-            return Optional.empty();
-        }
-        return university.get().getSubjects()
-                .stream().filter(subject -> subject.getId().equals(subjectId.toString()))
-                .findFirst();
+    public int deleteSubjectById(ObjectId subjectId) {
+        return subjectRepository.deleteById(subjectId);
     }
 
-    public Optional<Subject> updateOrRemoveSubjectById(ObjectId universityId,
-                                                       ObjectId subjectId,
-                                                       Subject subject) {
-        Optional<Subject> subjectMaybe = getSubjectById(universityId, subjectId);
-        if (subjectMaybe.isEmpty()) {
-            return Optional.empty();
-        }
-        University university = universityRepository.findById(universityId).get();
-        int i = 0;
-        List<Subject> subjects = university.getSubjects();
-        for (i = 0; i < subjects.size(); ++i) {
-            if (subjects.get(i).getId().equals(subjectId.toString())) {
-                break;
-            }
-        }
-
-        Subject newSubject;
-        if (subject != null) {
-            newSubject = new Subject(subjectId, subject.getCode(), subject.getName(), subject.getComments());
-            subjects.set(i, newSubject);
-        } else {
-            newSubject = subjects.get(i);
-            subjects.remove(i);
-        }
-
-        universityRepository.updateById(universityId,
-                new University(universityId,
-                        university.getName(),
-                        university.getCountry(),
-                        university.getCity(),
-                        subjects));
-        return Optional.of(newSubject);
+    public Optional<Subject> updateSubjectById(ObjectId id, Subject subject) {
+        return subjectRepository.updateById(id, subject);
     }
 
-    public Optional<Comment> addCommentToSubject(ObjectId universityId,
-                                                 ObjectId subjectId,
+    public Optional<Comment> addCommentToSubject(ObjectId subjectId,
                                                  Comment comment) {
-        Optional<Subject> subjectMaybe = getSubjectById(universityId, subjectId);
+        Optional<Subject> subjectMaybe = getSubjectById(subjectId);
         if (subjectMaybe.isEmpty()) {
             return Optional.empty();
         }
         Subject subject = subjectMaybe.get();
         subject.addComment(comment);
-        updateOrRemoveSubjectById(universityId, subjectId, subject);
+        subjectRepository.updateById(subjectId, subject);
         return Optional.of(comment);
+    }
+
+    public boolean addTutorOrPupilToSubject(ObjectId subjectId,
+                                            User user,
+                                            String property) {
+        Optional<Subject> subjectMaybe = getSubjectById(subjectId);
+        if (subjectMaybe.isEmpty()) {
+            return false;
+        }
+        Subject subject = subjectMaybe.get();
+        if (property.equals("tutor") && !subject.getTutors().contains(user)) {
+            subject.addTutor(user);
+        } else if (property.equals("pupil") && !subject.getPupils().contains(user)) {
+            subject.addPupil(user);
+        }
+
+        subjectRepository.updateById(subjectId, subject);
+        return true;
+    }
+
+    public List<Subject> tutorOrPupilOf(String property, User user, int page, int limit) {
+        return subjectRepository.containsTutorOrPupil(property, user, page, limit);
+    }
+
+    public List<Subject> getSubjectsByName(String name, int page, int limit) {
+        return subjectRepository.findByNameRegex(name, page, limit);
+    }
+
+    public boolean removeUserFromSubjectPupils(ObjectId subjectId, User user) {
+        Optional<Subject> subjectMaybe = getSubjectById(subjectId);
+        if (subjectMaybe.isEmpty()) {
+            return false;
+        }
+
+        Subject subject = subjectMaybe.get();
+        boolean success = subject.removePupil(user);
+        if (!success) {
+            return false;
+        }
+
+        updateSubjectById(subjectId, subject);
+        return true;
     }
 }
