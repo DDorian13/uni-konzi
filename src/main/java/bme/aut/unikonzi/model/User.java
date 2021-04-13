@@ -73,6 +73,9 @@ public class User {
     }
 
     public void addRole(Role role) {
+        if (this.role.size() == 0) {
+            this.role = new HashSet<>();
+        }
         this.role.add(role);
     }
 
