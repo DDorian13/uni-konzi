@@ -1,6 +1,5 @@
 package bme.aut.unikonzi.dao;
 
-import bme.aut.unikonzi.UniKonziApplication;
 import bme.aut.unikonzi.dao.impl.MongoUserDao;
 import bme.aut.unikonzi.model.User;
 import org.bson.types.ObjectId;

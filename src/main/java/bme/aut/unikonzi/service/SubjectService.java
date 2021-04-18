@@ -1,10 +1,8 @@
 package bme.aut.unikonzi.service;
 
 import bme.aut.unikonzi.dao.SubjectDao;
-import bme.aut.unikonzi.dao.UniversityDao;
 import bme.aut.unikonzi.model.Comment;
 import bme.aut.unikonzi.model.Subject;
-import bme.aut.unikonzi.model.University;
 import bme.aut.unikonzi.model.User;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
