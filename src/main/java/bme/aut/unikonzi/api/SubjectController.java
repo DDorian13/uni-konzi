@@ -46,7 +46,7 @@ public class SubjectController {
                                                @Valid @NonNull @RequestBody Subject subject) {
         Optional<Subject> newSubject = subjectService.updateSubjectById(subjectId, subject);
         if (newSubject.isEmpty()) {
-            String error = "{\"error\": \"The id of the university or the subject is invalid\"}";
+            String error = "{\"error\": \"The id of the subject is invalid\"}";
             return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(subjectsToJson(new String[]{"tutors", "pupils"}, newSubject.get()));
@@ -56,7 +56,7 @@ public class SubjectController {
     public ResponseEntity<?> getSubjectByIdWithComments(@PathVariable("subjectId") ObjectId subjectId) {
         Optional<Subject> subject = subjectService.getSubjectById(subjectId);
         if (subject.isEmpty()) {
-            String error = "{\"error\": \"The id of the university or the subject is invalid\"}";
+            String error = "{\"error\": \"The id of the subject is invalid\"}";
             return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(subjectsToJson(new String[]{"tutors", "pupils"}, subject.get()));
@@ -71,7 +71,7 @@ public class SubjectController {
         )).get();
         Optional<Comment> newComment = subjectService.addCommentToSubject(subjectId, new Comment(null, user, comment.getText()));
         if (newComment.isEmpty()) {
-            String error = "{\"error\": \"The id of the university or the subject is invalid\"}";
+            String error = "{\"error\": \"The id of the subject is invalid\"}";
             return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<Comment>(newComment.get(), HttpStatus.CREATED);
@@ -90,7 +90,7 @@ public class SubjectController {
         )).get();
         boolean successful = subjectService.addTutorOrPupilToSubject(subjectId, user, "tutor");
         if (!successful) {
-            String error = "{\"error\": \"The id of the university or the subject is invalid\"}";
+            String error = "{\"error\": \"The id of the subject is invalid\"}";
             return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
         }
         String message = "{\"message\": \"Tutor added\"}";
@@ -110,7 +110,7 @@ public class SubjectController {
         )).get();
         boolean successful = subjectService.addTutorOrPupilToSubject(subjectId, user, "pupil");
         if (!successful) {
-            String error = "{\"error\": \"The id of the university or the subject is invalid\"}";
+            String error = "{\"error\": \"The id of the subject is invalid\"}";
             return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
         }
         String message = "{\"message\": \"Pupil added\"}";
@@ -162,7 +162,7 @@ public class SubjectController {
     private ResponseEntity<?> getSubjectByIdExcept(ObjectId subjectId, String[] exceptions) {
         Optional<Subject> subject = subjectService.getSubjectById(subjectId);
         if (subject.isEmpty()) {
-            String error = "{\"error\": \"The id of the university or the subject is invalid\"}";
+            String error = "{\"error\": \"The id of the subject is invalid\"}";
             return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(subjectsToJson(exceptions, subject.get()));

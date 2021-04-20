@@ -4,6 +4,7 @@ import bme.aut.unikonzi.model.Appointment;
 import bme.aut.unikonzi.service.AppointmentService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class AppointmentController {
 
     @PostMapping
     public ResponseEntity<?> newAppointment(@Valid @NonNull @RequestBody Appointment appointment) {
-        return ResponseEntity.ok(appointmentService.add(appointment));
+        return new ResponseEntity<>(appointmentService.add(appointment), HttpStatus.CREATED);
     };
 
     @GetMapping(path = "{id1}/{id2}")

@@ -1,5 +1,6 @@
 package bme.aut.unikonzi.api;
 
+import bme.aut.unikonzi.exception.UserAlreadyExistsException;
 import bme.aut.unikonzi.model.payload.request.LoginUser;
 import bme.aut.unikonzi.model.User;
 import bme.aut.unikonzi.model.payload.response.JwtResponse;
@@ -50,12 +51,13 @@ public class UserController {
     public ResponseEntity<?> addUser(@Valid @NonNull @RequestBody User user) {
         user.setRole(Set.of(User.Role.ROLE_USER));
         user.setPassword(encoder.encode(user.getPassword()));
-        Optional<User> newUser = userService.addUser(user);
-        if (newUser.isEmpty()) {
-            String text = "{\"error\": \"Already registered with this email\"}";
-            return new ResponseEntity<String>(text, HttpStatus.CONFLICT);
+        try {
+            Optional<User> newUser = userService.addUser(user);
+            return new ResponseEntity<User>(newUser.get(), HttpStatus.CREATED);
+        } catch (UserAlreadyExistsException e) {
+            String error = "{ \"error\": \"" + e.getMessage() + "\" }";
+            return new ResponseEntity<String>(error, HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<User>(newUser.get(), HttpStatus.CREATED);
     }
 
     @GetMapping

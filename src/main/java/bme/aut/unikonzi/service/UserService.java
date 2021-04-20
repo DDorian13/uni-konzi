@@ -1,6 +1,7 @@
 package bme.aut.unikonzi.service;
 
 import bme.aut.unikonzi.dao.UserDao;
+import bme.aut.unikonzi.exception.UserAlreadyExistsException;
 import bme.aut.unikonzi.model.User;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,10 @@ public class UserService {
     public Optional<User> addUser(User user) {
         String email = user.getEmail();
         if (userRepository.findByEmail(email).isPresent()) {
-            return Optional.empty();
+            throw new UserAlreadyExistsException("User with this email already exists");
+        }
+        if (userRepository.findByName(user.getName()).isPresent()) {
+            throw new UserAlreadyExistsException("User with this username already exists");
         }
         return Optional.of(userRepository.insert(user));
     }
