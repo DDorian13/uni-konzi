@@ -1,7 +1,6 @@
 package bme.aut.unikonzi.service;
 
 import bme.aut.unikonzi.dao.AppointmentDao;
-import bme.aut.unikonzi.dao.impl.MongoAppointmentDao;
 import bme.aut.unikonzi.model.Appointment;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +11,10 @@ import java.util.List;
 @Service
 public class AppointmentService {
 
-    private final MongoAppointmentDao repository;
+    private final AppointmentDao repository;
 
     @Autowired
-    public AppointmentService(MongoAppointmentDao repository) {
+    public AppointmentService(AppointmentDao repository) {
         this.repository = repository;
     }
 

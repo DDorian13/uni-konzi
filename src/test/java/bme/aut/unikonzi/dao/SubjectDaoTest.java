@@ -124,5 +124,7 @@ public class SubjectDaoTest {
         subjects = subjectDao.containsTutorOrPupil("pupils", user, 1, 10);
         assertThat(subjects.size()).isEqualTo(1);
         assertThat(subjects.get(0).getId()).isEqualTo(subject_not.getId());
+
+        assertThat(subjectDao.containsTutorOrPupil("wrongPropertyName", user, 1, 10)).isEqualTo(Collections.emptyList());
     }
 }

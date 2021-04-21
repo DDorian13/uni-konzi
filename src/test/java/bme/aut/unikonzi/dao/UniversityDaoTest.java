@@ -29,7 +29,7 @@ public class UniversityDaoTest {
         );
     }
 
-    @DisplayName("Update by id")
+    @DisplayName("Update by id successful")
     @Test
     public void updateTest() {
         ObjectId id = new ObjectId();
@@ -46,6 +46,13 @@ public class UniversityDaoTest {
         assertThat(dbUni.getCountry()).isEqualTo(uni.getCountry());
         assertThat(dbUni.getCity()).isEqualTo(uni.getCity());
         assertThat(dbUni.getSubjects()).isEqualTo(uni.getSubjects());
+    }
+
+    @DisplayName("Update by id, not exists")
+    @Test
+    public void updateByIdNotExistsTest() {
+        University uni = new University(null, "university", "country", "city", Collections.emptyList());
+        assertThat(universityDao.updateById(new ObjectId(), uni)).isEqualTo(Optional.empty());
     }
 
     @DisplayName("Find by name")

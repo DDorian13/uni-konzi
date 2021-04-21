@@ -1,7 +1,7 @@
 package bme.aut.unikonzi.service;
 
 import bme.aut.unikonzi.dao.ChatRoomRepository;
-import bme.aut.unikonzi.dao.impl.MongoUserDao;
+import bme.aut.unikonzi.dao.UserDao;
 import bme.aut.unikonzi.model.ChatRoom;
 import bme.aut.unikonzi.model.User;
 import org.bson.types.ObjectId;
@@ -19,7 +19,7 @@ public class ChatRoomService {
     private ChatRoomRepository chatRoomRepository;
 
     @Autowired
-    private MongoUserDao userRepository;
+    private UserDao userRepository;
 
     public Optional<String> getChatId(String senderId, String recipientId, boolean createIfNotExist) {
         return chatRoomRepository.findBySenderIdAndRecipientId(senderId, recipientId)

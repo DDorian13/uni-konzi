@@ -61,6 +61,8 @@ public class SubjectService {
             subject.addTutor(user);
         } else if (property.equals("pupil") && !subject.getPupils().contains(user)) {
             subject.addPupil(user);
+        } else {
+            return false;
         }
 
         subjectRepository.updateById(subjectId, subject);

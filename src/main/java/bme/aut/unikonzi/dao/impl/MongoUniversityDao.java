@@ -43,7 +43,7 @@ public class MongoUniversityDao extends MongoCommonDao<University> implements Un
     public Optional<University> updateById(ObjectId id, University university) {
         Optional<University> uniById = super.findById(id);
         if (uniById.isEmpty()) {
-            return uniById;
+            return Optional.empty();
         }
         university.setId(id);
         mongoTemplate.save(university, collectionName);

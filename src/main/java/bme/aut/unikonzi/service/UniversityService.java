@@ -60,8 +60,7 @@ public class UniversityService {
         }
 
         University university = uniMaybe.get();
-        university.removeSubject(subject);
-        return 1;
+        return university.removeSubject(subject) ? 1 : 0;
     }
 
     public List<University> getUniversitiesByNameRegex(String name, int page, int limit) {
