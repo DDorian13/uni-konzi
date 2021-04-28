@@ -5,8 +5,6 @@ import bme.aut.unikonzi.exception.UserAlreadyExistsException;
 import bme.aut.unikonzi.helper.TokenMock;
 import bme.aut.unikonzi.model.User;
 import bme.aut.unikonzi.model.payload.request.LoginUser;
-import bme.aut.unikonzi.security.jwt.AuthEntryPointJwt;
-import bme.aut.unikonzi.security.jwt.JwtUtils;
 import bme.aut.unikonzi.service.UserService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +25,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -48,10 +47,7 @@ public class UserControllerTest {
     private ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    PasswordEncoder encoder;
-
-    @Autowired
-    JwtUtils jwtUtils;
+    private PasswordEncoder encoder;
 
     @MockBean
     private UserService service;
@@ -262,11 +258,14 @@ public class UserControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    // Not working properly
-    //@Test
-    //@DisplayName("Login successful")
+    @Test
+    @DisplayName("Login successful")
     public void loginSuccessfulTest() throws Exception {
-        LoginUser loginUser = new LoginUser("username", "pass");
+        LoginUser loginUser = new LoginUser("username", "password");
+        User newUser = new User(new ObjectId(), loginUser.getUsername(), "my@email.com",
+                encoder.encode(loginUser.getPassword()), Set.of(User.Role.ROLE_USER));
+        Mockito.when(userRepository.findByName("username"))
+                .thenReturn(Optional.of(newUser));
 
         mockMvc.perform(post("/api/users/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -274,5 +273,35 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString("username")));
+    }
+
+    @Test
+    @DisplayName("Login wrong password")
+    public void loginWrongPasswordTest() throws Exception {
+        User newUser = new User(new ObjectId(), "username", "my@email.com",
+                encoder.encode("password"), Set.of(User.Role.ROLE_USER));
+        Mockito.when(userRepository.findByName("username"))
+                .thenReturn(Optional.of(newUser));
+        LoginUser loginUser = new LoginUser("username", "myWrongPassword");
+
+        mockMvc.perform(post("/api/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(loginUser)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("Login wrong username")
+    public void loginWrongUsernameTest() throws Exception {
+        User newUser = new User(new ObjectId(), "username", "my@email.com",
+                encoder.encode("password"), Set.of(User.Role.ROLE_USER));
+        Mockito.when(userRepository.findByName("username"))
+                .thenReturn(Optional.of(newUser));
+        LoginUser loginUser = new LoginUser("wrongUsername", "password");
+
+        mockMvc.perform(post("/api/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(loginUser)))
+                .andExpect(status().isUnauthorized());
     }
 }
