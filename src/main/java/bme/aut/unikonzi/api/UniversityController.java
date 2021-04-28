@@ -1,8 +1,6 @@
 package bme.aut.unikonzi.api;
 
-import bme.aut.unikonzi.model.Subject;
 import bme.aut.unikonzi.model.University;
-import bme.aut.unikonzi.service.SubjectService;
 import bme.aut.unikonzi.service.UniversityService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -18,10 +16,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 
-import static bme.aut.unikonzi.api.SubjectController.subjectsToJson;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping(value = "api/universities", produces = "application/json")
@@ -29,12 +25,10 @@ import static bme.aut.unikonzi.api.SubjectController.subjectsToJson;
 public class UniversityController {
 
     private final UniversityService universityService;
-    private final SubjectService subjectService;
 
     @Autowired
-    public UniversityController(UniversityService universityService, SubjectService subjectService) {
+    public UniversityController(UniversityService universityService) {
         this.universityService = universityService;
-        this.subjectService = subjectService;
     }
 
     @GetMapping
@@ -61,7 +55,7 @@ public class UniversityController {
                                                @RequestParam(defaultValue = "10", required = false) int limit) {
         Optional<University> university = universityService.getUniversityById(id, page, limit);
         if (university.isEmpty()) {
-            String error = "{\"error\": \"University with the given id does not exists\"}";
+            String error = "{\"error\": \"The id of the university is invalid\"}";
             return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(universitiesToJson(true, university.get()));
@@ -71,7 +65,7 @@ public class UniversityController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUniversityById(@PathVariable("id") ObjectId id) {
         if (universityService.deleteUniversity(id) == 0) {
-            String error = "{\"error\": \"University with the given id does not exists\"}";
+            String error = "{\"error\": \"The id of the university is invalid\"}";
             return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
         }
         String message = "{\"message\": \"The university was deleted successfully\"}";
@@ -84,7 +78,7 @@ public class UniversityController {
                                                   @Valid @NonNull @RequestBody University university) {
         Optional<University> updatedUniversity = universityService.updateUniversityById(id, university);
         if (updatedUniversity.isEmpty()) {
-            String error = "{\"error\": \"University with the given id does not exists\"}";
+            String error = "{\"error\": \"The id of the university is invalid\"}";
             return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(universitiesToJson(true, updatedUniversity.get()));
@@ -99,31 +93,7 @@ public class UniversityController {
                         universityService.getUniversitiesByNameRegex(nameLike, page, limit)));
     }
 
-    @PostMapping(path = "{universityId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> addSubject(@PathVariable("universityId") ObjectId universityId,
-                                        @Valid @NonNull @RequestBody Subject subject) {
-        Optional<University> uniMaybe = universityService.getUniversityById(universityId, 1, 10);
-        if (uniMaybe.isEmpty()) {
-            String error = "{\"error\": \"University with the given id does not exists\"}";
-            return new ResponseEntity<String>(error, HttpStatus.NOT_FOUND);
-        }
-        University uni = uniMaybe.get();
-        List<Subject> subjects = uni.getSubjects();
-        for (Subject _subject : subjects) {
-            if (_subject.getCode().equalsIgnoreCase(subject.getCode())) {
-                String error = "{\"error\": \"Subject already exists\"}";
-                return new ResponseEntity<String>(error, HttpStatus.CONFLICT);
-            }
-        }
-        Subject newSubject = subjectService.addSubject(subject).get();
-        uni.addSubject(newSubject);
-        universityService.updateUniversityById(universityId, uni);
-        return new ResponseEntity<String>(subjectsToJson(new String[]{"tutors", "pupils"}, newSubject), HttpStatus.CREATED);
-    }
-
-
-    private String universitiesToJson(boolean withSubjects, Object value) {
+    public static String universitiesToJson(boolean withSubjects, Object value) {
         ObjectMapper mapper = new ObjectMapper();
         FilterProvider filter;
         if (withSubjects) {

@@ -1,5 +1,6 @@
 package bme.aut.unikonzi.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -7,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.Objects;
 
 @Document("appointments")
 public class Appointment {
@@ -21,13 +23,13 @@ public class Appointment {
     private String description;
     private String location;
 
-    public Appointment(ObjectId id,
-                       ObjectId creatorId,
-                       ObjectId participantId,
-                       Date date,
-                       int length,
-                       String description,
-                       String location) {
+    public Appointment(@JsonProperty("id") ObjectId id,
+                       @JsonProperty("creatorId") ObjectId creatorId,
+                       @JsonProperty("participantId") ObjectId participantId,
+                       @JsonProperty("date") Date date,
+                       @JsonProperty("length") int length,
+                       @JsonProperty("description") String description,
+                       @JsonProperty("location") String location) {
         this.id = id;
         this.creatorId = creatorId;
         this.participantId = participantId;
@@ -87,5 +89,24 @@ public class Appointment {
 
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Appointment apt = (Appointment) o;
+        if (!apt.id.equals(this.id) || !apt.creatorId.equals((this.creatorId))
+                || !apt.participantId.equals(this.participantId) || !apt.date.equals(this.date)
+                || apt.length != this.length || !apt.description.equals(this.description)
+                || !apt.location.equals(this.location)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

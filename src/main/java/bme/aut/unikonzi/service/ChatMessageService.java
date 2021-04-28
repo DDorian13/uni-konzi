@@ -33,7 +33,11 @@ public class ChatMessageService {
     }
 
     public int hasNewMessageFromAnybody(String recipientId) {
-        return chatMessageRepository.findFirstByRecipientIdAndMessageStatus(recipientId, MessageStatus.RECEIVED).isPresent() ? 1 : 0;
+        if (chatMessageRepository.findFirstByRecipientIdAndMessageStatus(recipientId, MessageStatus.RECEIVED).isPresent()) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 
     public long countNewMessages(String senderId, String recipientId) {

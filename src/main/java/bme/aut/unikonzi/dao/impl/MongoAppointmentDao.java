@@ -21,7 +21,8 @@ public class MongoAppointmentDao implements AppointmentDao {
 
     @Override
     public Appointment insert(Appointment appointment) {
-        return mongoTemplate.insert(appointment);
+        Appointment newAppointment = mongoTemplate.insert(appointment, collectionName);
+        return newAppointment;
     }
 
     @Override

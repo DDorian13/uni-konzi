@@ -78,6 +78,8 @@ public class ChatController {
 
     @PostMapping("new")
     public ResponseEntity<?> newContact(@Valid @NonNull @RequestBody NewContact contact){
-        return new ResponseEntity<>(chatRoomService.getChatId(contact.getSenderId(), contact.getRecipientId(), true), HttpStatus.CREATED);
+        return new ResponseEntity<>(
+                chatRoomService.getChatId(contact.getSenderId(), contact.getRecipientId(), true),
+                HttpStatus.CREATED);
     }
 }
