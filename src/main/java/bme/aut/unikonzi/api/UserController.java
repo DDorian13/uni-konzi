@@ -49,7 +49,7 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> addUser(@Valid @NonNull @RequestBody User user) {
-        user.setRole(Set.of(User.Role.ROLE_USER));
+        user.setRoles(Set.of(User.Role.ROLE_USER));
         user.setPassword(encoder.encode(user.getPassword()));
         try {
             Optional<User> newUser = userService.addUser(user);

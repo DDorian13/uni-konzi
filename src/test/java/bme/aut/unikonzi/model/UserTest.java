@@ -43,7 +43,7 @@ public class UserTest {
     @Test
     public void setRoleTest() {
         assertThat(user.getRoles()).isEqualTo(Collections.emptySet());
-        user.setRole(Set.of(User.Role.ROLE_USER));
+        user.setRoles(Set.of(User.Role.ROLE_USER));
         assertThat(user.getRoles()).isEqualTo(Set.of(User.Role.ROLE_USER));
     }
 }

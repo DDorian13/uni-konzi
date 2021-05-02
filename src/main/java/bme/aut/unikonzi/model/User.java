@@ -79,12 +79,6 @@ public class User {
         this.role.add(role);
     }
 
-    public void setRole(Set<Role> role) {
-        this.role = role;
-    }
-
-    // Test failed, because of property without setter
-    // However, this setter solved it
     public void setRoles(Set<Role> role) {
         this.role = role;
     }
